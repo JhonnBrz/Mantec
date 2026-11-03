@@ -41,6 +41,13 @@
     else document.body.style.overflow = open ? 'hidden' : '';
   };
   burger.addEventListener('click', () => setMenu(!root.classList.contains('menu-open')));
+  // Toque fora do painel só fecha o menu (não aciona o que estiver embaixo)
+  document.addEventListener('click', (e) => {
+    if (!root.classList.contains('menu-open') || menu.contains(e.target) || burger.contains(e.target)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setMenu(false);
+  }, true);
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && root.classList.contains('menu-open')) { setMenu(false); burger.focus(); }
   });
@@ -131,6 +138,7 @@
   const fab = $('[data-fab]');
   const bar = $('.progress__bar');
   const contato = $('#contato');
+  const darkSec = $('#estrutura');
   let lastY = window.scrollY;
   let ticking = false;
 
@@ -146,6 +154,11 @@
       if (goingDown && y > vh * 0.6) hdr.classList.add('is-hidden');
       else if (goingUp || y < vh * 0.6) hdr.classList.remove('is-hidden');
     }
+
+    // O vidro da barra e do botão flutuante escurece sobre a seção escura
+    const dr = darkSec.getBoundingClientRect();
+    hdr.classList.toggle('is-dark', dr.top <= 40 && dr.bottom >= 40 && !root.classList.contains('menu-open'));
+    fab.classList.toggle('is-dark', dr.top <= vh - 44 && dr.bottom >= vh - 44);
 
     const nearContact = contato.getBoundingClientRect().top < vh * 0.9;
     fab.classList.toggle('is-on', y > vh * 0.75 && !nearContact);
@@ -231,11 +244,11 @@
     setWork(0);
   }
 
-  /* Emblema 3D do hero (desktop) ----------------------------------------- */
+  /* Emblema 3D do hero ----------------------------------------- */
   const emblem = { assemble: reduceMotion ? 1 : 0, scroll: 0 };
   const initEmblem = () => {
     const canvas = $('[data-emblem]');
-    if (!canvas || !desktop.matches) return false;
+    if (!canvas) return false;
     if (!window.THREE) { root.classList.add('no-webgl'); return false; }
     let renderer;
     try {
@@ -365,6 +378,42 @@
     return true;
   };
   const emblemOn = initEmblem();
+
+  /* Liquid Glass interativo: brilho segue o ponteiro, lente desliza nos links */
+  if (finePointer) {
+    $$('.hdr__bar, .fab, .kcard, .works, .svcx__nav, .mvv, .stat, .feats').forEach((el) => {
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+        el.style.setProperty('--my', `${e.clientY - r.top}px`);
+      });
+    });
+    const nav = $('.hdr__nav');
+    const lens = document.createElement('span');
+    lens.className = 'hdr__lens';
+    lens.setAttribute('aria-hidden', 'true');
+    nav.prepend(lens);
+    const moveLens = (a) => {
+      lens.style.width = `${a.offsetWidth}px`;
+      lens.style.transform = `translateX(${a.offsetLeft}px)`;
+    };
+    $$('a', nav).forEach((a) => {
+      a.addEventListener('pointerenter', () => {
+        // Na primeira entrada a lente nasce no link, sem deslizar de longe
+        if (!nav.classList.contains('has-lens')) {
+          lens.style.transition = 'none';
+          moveLens(a);
+          void lens.offsetWidth;
+          lens.style.transition = '';
+        }
+        moveLens(a);
+        nav.classList.add('has-lens');
+      });
+      a.addEventListener('pointerdown', () => lens.classList.add('is-press'));
+    });
+    window.addEventListener('pointerup', () => lens.classList.remove('is-press'));
+    nav.addEventListener('pointerleave', () => { nav.classList.remove('has-lens'); lens.classList.remove('is-press'); });
+  }
 
   /* Sem animação: mostra tudo e encerra ---------------------------------- */
   if (!animate) {

@@ -35,6 +35,27 @@
 
   --ease: cubic-bezier(.16, 1, .3, 1);
   --ease-io: cubic-bezier(.65, 0, .35, 1);
+
+  /* Estilo Apple: raios, cartões e Liquid Glass */
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+  --card: #F5F5F7;
+  --card-dark: #1C1C1E;
+
+  --glass-fill: linear-gradient(180deg, rgba(228, 228, 233, .74), rgba(206, 206, 213, .58));
+  --glass-card: linear-gradient(160deg, rgba(120, 120, 128, .09), rgba(120, 120, 128, .17));
+  --glass-card-dark: linear-gradient(160deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .04));
+  --glass-card-filter: blur(18px) saturate(170%);
+  --glass-card-shadow: 0 10px 30px rgba(15, 15, 18, .07), 0 0 0 .5px rgba(15, 15, 18, .08);
+  --glass-filter: blur(24px) saturate(190%);
+  --glass-rim: inset 0 1px 0 rgba(255, 255, 255, .9), inset 0 -1px 0 rgba(255, 255, 255, .25), inset 0 0 0 1px rgba(255, 255, 255, .45);
+  --glass-shadow: 0 12px 40px rgba(15, 15, 18, .14), 0 1px 3px rgba(15, 15, 18, .08), 0 0 0 .5px rgba(15, 15, 18, .08);
+  --glass-fill-dark: linear-gradient(180deg, rgba(44, 44, 50, .58), rgba(22, 22, 26, .46));
+  --glass-rim-dark: inset 0 1px 0 rgba(255, 255, 255, .22), inset 0 0 0 1px rgba(255, 255, 255, .1);
+  --spring: cubic-bezier(.34, 1.45, .64, 1);
 }
 
 /* Reset ------------------------------------------------------------------ */
@@ -695,6 +716,261 @@ h1, h2, h3, h4 { font-weight: inherit; font-size: inherit; line-height: inherit;
   .fab:hover .fab__txt, .fab:focus-visible .fab__txt { max-width: 140px; opacity: 1; margin-left: 10px; }
 }
 
+/* ========================================================================
+   Estilo Apple + Liquid Glass (sobre o layout original)
+   ======================================================================== */
+
+/* Fundos brancos; os blocos de texto ficam em cinza claro */
+.sec--paper { background: var(--white); }
+:focus-visible { border-radius: var(--r-sm); }
+
+/* Vidro líquido: camada funcional (navegação e ações flutuantes) */
+.glass, .hdr__bar, .fab {
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-filter);
+          backdrop-filter: var(--glass-filter);
+  box-shadow: var(--glass-rim), var(--glass-shadow);
+}
+
+/* Barra de navegação flutuante em cápsula */
+.hdr, .hdr.is-solid { background: transparent; border-bottom-color: transparent; padding-top: 12px; pointer-events: none; }
+.hdr.is-hidden { transform: translateY(-130%); }
+.hdr__bar {
+  pointer-events: auto;
+  width: min(100% - 24px, var(--max) + 48px);
+  height: 56px;
+  padding: 0 8px 0 10px;
+  gap: 20px;
+  border-radius: var(--r-pill);
+  transition: background .4s var(--ease), box-shadow .4s var(--ease), color .4s var(--ease);
+}
+.hdr__logo { border-radius: var(--r-pill); padding: 8px 14px; }
+.hdr__logo img { height: 20px; }
+.hdr__nav { gap: 4px; }
+.hdr__nav a { display: inline-flex; align-items: center; min-height: 38px; padding: 0 14px; border-radius: var(--r-pill); transition: color .3s, background-color .3s; }
+.hdr__nav a::after { display: none; }
+.hdr__nav a:hover { background: rgba(15, 15, 18, .06); }
+.hdr__nav a.is-current { background: rgba(15, 15, 18, .09); color: var(--ink); }
+.hdr__cta { border-radius: var(--r-pill); }
+/* Sobre a seção escura o vidro escurece */
+.hdr.is-dark .hdr__bar { background: var(--glass-fill-dark); box-shadow: var(--glass-rim-dark), var(--glass-shadow); color: var(--white); }
+.hdr.is-dark .hdr__nav a { color: rgba(255, 255, 255, .72); }
+.hdr.is-dark .hdr__nav a:hover { background: rgba(255, 255, 255, .1); color: var(--white); }
+.hdr.is-dark .hdr__nav a.is-current { background: rgba(255, 255, 255, .16); color: var(--white); }
+.hdr.is-dark .hdr__cta { background: var(--yellow); color: var(--ink); }
+.hdr__burger { margin-right: 0; border-radius: var(--r-pill); }
+
+/* Botões em cápsula com resposta ao toque */
+.btn { border-radius: var(--r-pill); transition: background-color .45s var(--ease), color .45s var(--ease), transform .15s ease; }
+.btn:active { transform: scale(.97); }
+
+/* Menu do celular: painel de vidro compacto que abre abaixo da barra */
+.menu, .menu-open .menu {
+  inset: auto;
+  top: 76px; left: 10px; right: 10px;
+  max-height: calc(100svh - 92px);
+  overflow-y: auto;
+  padding: 8px;
+  gap: 8px;
+  justify-content: flex-start;
+  border-radius: 26px;
+  clip-path: none;
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-filter);
+          backdrop-filter: var(--glass-filter);
+  box-shadow: var(--glass-rim), var(--glass-shadow);
+}
+.menu {
+  opacity: 0; transform: translateY(-10px) scale(.94); transform-origin: 92% 0;
+  transition: opacity .2s ease, transform .35s var(--ease), visibility 0s linear .35s;
+}
+.menu-open .menu {
+  opacity: 1; transform: none;
+  transition: opacity .25s ease, transform .55s var(--spring), visibility 0s;
+}
+.menu__nav { border-top: 0; }
+.menu__nav a {
+  font-size: 1.25rem; line-height: 1.2;
+  padding: 15px 14px;
+  border-radius: var(--r-md);
+  border-bottom: 0;
+  opacity: 0; transform: translateY(-6px);
+  transition: opacity .3s ease, transform .45s var(--ease), background-color .2s ease;
+}
+.menu__nav a + a { box-shadow: inset 0 1px 0 var(--line); }
+.menu__nav a:active { background: rgba(15, 15, 18, .06); }
+.menu-open .menu__nav a { opacity: 1; transform: none; }
+.menu-open .menu__nav a:nth-child(1) { transition-delay: .04s; }
+.menu-open .menu__nav a:nth-child(2) { transition-delay: .07s; }
+.menu-open .menu__nav a:nth-child(3) { transition-delay: .1s; }
+.menu-open .menu__nav a:nth-child(4) { transition-delay: .13s; }
+.menu-open .menu__nav a:nth-child(5) { transition-delay: .16s; }
+.menu__foot { gap: 8px; align-items: stretch; padding: 4px 4px 6px; }
+.menu__foot .btn { border-radius: var(--r-pill); width: 100%; }
+.menu__foot .mono { text-align: center; }
+
+/* Fotos com cantos arredondados */
+.photo__frame { border-radius: var(--r-xl); }
+.cat .photo__frame, .about__media .photo__frame { border-radius: var(--r-xl); }
+
+/* Cartões "Conheça mais" */
+.kcard { background: var(--card); border-radius: var(--r-xl); overflow: hidden; }
+.kcard__photo .photo__frame { border-radius: 0; }
+.kcard__photo::after { display: none; }
+.kcard__body { padding: 22px 24px 28px; }
+.kcard__tag { border-radius: var(--r-pill); padding: 7px 12px 6px; }
+
+/* Estrutura (seção escura): números em blocos arredondados */
+.stats { border-top: 0; gap: 12px; }
+.stat, .stat:nth-child(odd), .stat:nth-child(even) {
+  padding: 24px; border: 0;
+  background: var(--card-dark);
+  border-radius: var(--r-lg);
+}
+.feats { background: var(--card-dark); border-radius: var(--r-lg); padding: 6px 22px; column-gap: 32px; margin-top: 12px; }
+.feats li:nth-last-child(-n + 2) { border-bottom: 0; }
+.specs__aside .btn { border-radius: var(--r-pill); }
+
+/* Serviços: barra lateral arredondada com seleção deslizante */
+.svcx__pin { border-block: 0; }
+.svcx__nav { border-top: 0; background: var(--card); border-radius: var(--r-lg); padding: 8px; }
+.svcx__ind { left: 8px; right: 8px; border-radius: var(--r-sm); }
+.svcx__nav li { position: relative; z-index: 1; }
+.svcx__nav button { border-bottom: 0; border-radius: var(--r-sm); }
+.svcx__progress { height: 4px; border-radius: var(--r-pill); margin-inline: 12px; overflow: hidden; }
+.svcx__frame { border-radius: var(--r-xl); }
+
+/* Obras: lista em cartão, linha ativa em cápsula escura */
+.works { border-top: 0; background: var(--card); border-radius: var(--r-lg); padding: 8px; }
+.work { border-bottom: 0; padding-inline: 18px; border-radius: var(--r-md); }
+.work + .work { box-shadow: inset 0 1px 0 var(--line); }
+.work.is-active, .work.is-active + .work { box-shadow: none; }
+.work::before { border-radius: var(--r-md); inset: 0; }
+.works__frame { border-radius: var(--r-xl); border: 0; background: var(--card); }
+
+/* Clientes: logos em blocos arredondados */
+.logos { border-block: 0; gap: 12px; }
+.logos__row { gap: 12px; padding-right: 12px; }
+.logos__row + .logos__row { border-top: 0; }
+.logos__set { gap: 12px; }
+.logos__set img { border-right: 0; border-radius: var(--r-md); background: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
+
+/* Missão, Visão e Valores em cartão */
+.mvv { border-top: 0; background: var(--card); border-radius: var(--r-xl); padding-inline: clamp(22px, 3vw, 40px); }
+.mvv__row { border-bottom: 0; }
+.mvv__row + .mvv__row { box-shadow: inset 0 1px 0 var(--line-strong); }
+
+/* Contato */
+.cta__wa { border-radius: var(--r-pill); padding-right: 28px; }
+.cta__wa-ico { border-radius: 50%; }
+
+/* Rodapé */
+.ftr__logo { border-radius: var(--r-pill); }
+
+/* Botão do WhatsApp flutuante em vidro */
+.fab { color: var(--ink); }
+.fab:hover { background: var(--glass-fill); box-shadow: var(--glass-rim), 0 16px 48px rgba(15, 15, 18, .2); }
+.fab.is-dark { background: var(--glass-fill-dark); box-shadow: var(--glass-rim-dark), var(--glass-shadow); color: var(--white); }
+
+/* Vidro interativo ------------------------------------------------------- */
+.hdr__bar { position: relative; isolation: isolate; }
+.fab { isolation: isolate; }
+/* Brilho especular que acompanha o ponteiro (posição vem do JS) */
+.hdr__bar::before, .fab::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  border-radius: inherit; pointer-events: none;
+  background: radial-gradient(200px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .8), rgba(255, 255, 255, 0) 70%);
+  opacity: 0; transition: opacity .4s var(--ease);
+}
+.hdr.is-dark .hdr__bar::before, .fab.is-dark::before {
+  background: radial-gradient(200px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .22), rgba(255, 255, 255, 0) 70%);
+}
+
+/* Lente de vidro que desliza entre os links */
+.hdr__nav { position: relative; }
+.hdr__nav a { position: relative; z-index: 1; }
+.hdr__lens {
+  position: absolute; left: 0; top: 50%; z-index: 0;
+  height: 38px; margin-top: -19px; width: 0;
+  border-radius: var(--r-pill);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .95), rgba(255, 255, 255, .6));
+  box-shadow: inset 0 1px 0 #fff, inset 0 0 0 1px rgba(255, 255, 255, .7), 0 6px 18px rgba(15, 15, 18, .14), 0 0 0 .5px rgba(15, 15, 18, .08);
+  opacity: 0; pointer-events: none;
+  transition: transform .5s var(--spring), width .5s var(--spring), opacity .25s ease, scale .2s ease;
+}
+.hdr__nav.has-lens .hdr__lens { opacity: 1; }
+.hdr__lens.is-press { scale: .92; }
+.hdr__nav.has-lens a:hover { background: transparent; color: var(--ink); }
+.hdr.is-dark .hdr__lens {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, .1));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), inset 0 0 0 1px rgba(255, 255, 255, .14), 0 6px 18px rgba(0, 0, 0, .3);
+}
+.hdr.is-dark .hdr__nav.has-lens a:hover { color: var(--white); }
+
+/* Resposta ao passar o mouse e ao clicar */
+.hdr__logo, .hdr__cta, .hdr__burger { transition: transform .45s var(--spring), background-color .35s ease, color .35s ease, box-shadow .35s ease; }
+.hdr__cta:active, .hdr__logo:active, .hdr__burger:active { transform: scale(.94); }
+.fab { transition: transform .6s var(--spring), background .4s ease, box-shadow .4s ease, color .4s ease; }
+.fab.is-on:active { transform: scale(.94); }
+@media (hover: hover) and (pointer: fine) {
+  .hdr__bar:hover::before, .fab:hover::before { opacity: 1; }
+  .hdr__bar:hover { box-shadow: var(--glass-rim), 0 16px 48px rgba(15, 15, 18, .18), 0 1px 3px rgba(15, 15, 18, .08), 0 0 0 .5px rgba(15, 15, 18, .1); }
+  .hdr__logo:hover { transform: scale(1.05); }
+  .hdr__cta:hover { transform: scale(1.06); box-shadow: 0 8px 20px rgba(15, 15, 18, .22); }
+  .hdr__burger:hover { background: rgba(15, 15, 18, .06); }
+  .fab.is-on:hover { transform: scale(1.07); }
+}
+
+/* Liquid Glass nas áreas de conteúdo ------------------------------------ */
+.kcard, .works, .svcx__nav, .mvv {
+  position: relative; isolation: isolate;
+  background: var(--glass-card);
+  -webkit-backdrop-filter: var(--glass-card-filter);
+          backdrop-filter: var(--glass-card-filter);
+  box-shadow: var(--glass-rim), var(--glass-card-shadow);
+}
+.stat, .stat:nth-child(odd), .stat:nth-child(even), .feats {
+  position: relative; isolation: isolate;
+  background: var(--glass-card-dark);
+  -webkit-backdrop-filter: var(--glass-card-filter);
+          backdrop-filter: var(--glass-card-filter);
+  box-shadow: var(--glass-rim-dark), 0 12px 32px rgba(0, 0, 0, .35);
+}
+/* O mesmo brilho que acompanha o ponteiro */
+.kcard::before, .works::before, .svcx__nav::before, .mvv::before, .stat::before, .feats::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  border-radius: inherit; pointer-events: none;
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .75), rgba(255, 255, 255, 0) 70%);
+  opacity: 0; transition: opacity .4s var(--ease);
+}
+.stat::before, .feats::before {
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .16), rgba(255, 255, 255, 0) 70%);
+}
+.kcard, .stat { transition: transform .5s var(--spring), box-shadow .4s ease; }
+@media (hover: hover) and (pointer: fine) {
+  .kcard:hover::before, .works:hover::before, .svcx__nav:hover::before, .mvv:hover::before, .stat:hover::before, .feats:hover::before { opacity: 1; }
+  .kcard:hover { transform: translateY(-6px); box-shadow: var(--glass-rim), 0 18px 44px rgba(15, 15, 18, .12), 0 0 0 .5px rgba(15, 15, 18, .08); }
+  .stat:hover { transform: translateY(-4px); }
+}
+
+/* Missão, Visão e Valores: cartão compacto e discreto */
+#proposito { padding-block: clamp(56px, 6vw, 96px); }
+.mvv { display: grid; grid-template-columns: 1.3fr 1fr 1.1fr; padding: 6px; border-radius: var(--r-lg); }
+.mvv__row { display: block; padding: 20px 22px; }
+.mvv__row + .mvv__row { box-shadow: inset 1px 0 0 var(--line); }
+.mvv__row dt { font-size: .75rem; letter-spacing: .03em; color: var(--muted); margin-bottom: 8px; }
+.mvv__big { font-size: 1rem; font-weight: 500; letter-spacing: 0; line-height: 1.45; }
+.values { grid-template-columns: 1fr; gap: 4px; }
+.values li { font-size: .9375rem; font-weight: 500; letter-spacing: 0; line-height: 1.45; }
+
+/* Transparência reduzida: vidro vira superfície sólida */
+@media (prefers-reduced-transparency: reduce) {
+  .hdr__bar, .fab, .menu, .menu-open .menu { background: var(--white); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .hdr.is-dark .hdr__bar, .fab.is-dark { background: var(--ink-2); }
+  .kcard, .works, .svcx__nav, .mvv { background: var(--card); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .stat, .stat:nth-child(odd), .stat:nth-child(even), .feats { background: var(--card-dark); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+
 /* Estados iniciais de animação (só com JS) ------------------------------ */
 .js .hero__name .ln > span { transform: translateY(105%); }
 .js [data-intro] { opacity: 0; transform: translateY(16px); }
@@ -839,6 +1115,70 @@ h1, h2, h3, h4 { font-weight: inherit; font-size: inherit; line-height: inherit;
   .ftr__col:nth-of-type(2) { grid-column: 7 / -1; }
   .ftr__col:nth-of-type(3) { grid-column: 1 / -1; }
   .ftr__bottom { padding-bottom: 28px; }
+}
+
+
+/* Estilo Apple no celular e tablet */
+@media (max-width: 1023px) {
+  .hdr__bar { width: calc(100% - 20px); padding: 0 6px 0 8px; gap: 8px; }
+  .hdr__cta { border-radius: 50%; }
+  .stat, .stat:nth-child(odd), .stat:nth-child(even) { padding: 18px; }
+  .feats { padding: 4px 18px; }
+  .feats li:nth-last-child(2) { border-bottom: 1px solid var(--line-inv); }
+  .svc__list { border-top: 0; background: var(--card); border-radius: var(--r-lg); padding: 0 16px; }
+  .svc__item { border-bottom: 0; }
+  .svc__item + .svc__item { box-shadow: inset 0 1px 0 var(--line); }
+  .svc__plus { border-radius: 50%; }
+  .svc__img { border-radius: var(--r-md); }
+  .works { padding: 6px; }
+  .work { padding-inline: 10px; }
+  .work__thumb { border-radius: var(--r-sm); }
+  .mvv { grid-template-columns: 1fr; }
+  .mvv__row { padding: 16px 18px; }
+  .mvv__row + .mvv__row { box-shadow: inset 0 1px 0 var(--line); }
+  .mvv__row dt { margin-bottom: 6px; }
+  .mvv__big { font-size: .9688rem; }
+  .values { grid-template-columns: 1fr; gap: 2px; }
+  .values li { font-size: .9375rem; }
+  .kcard__body { padding: 18px 20px 24px; }
+}
+
+/* Hero no celular e tablet: mesma linguagem do desktop, compacto -------- */
+@media (max-width: 1023px) {
+  /* O topo ocupa a primeira tela; a faixa dos serviços aparece logo no fim dela */
+  .hero { min-height: calc(100vh - 58px); min-height: calc(100svh - 58px); }
+  .hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "eyebrow" "name" "tag" "stage" "cta";
+    grid-template-rows: auto auto auto minmax(210px, 1fr) auto;
+    align-items: start;
+    padding-block: 16px 36px;
+  }
+  .eyebrow { grid-area: eyebrow; margin-bottom: 12px; }
+  .hero__name { grid-area: name; margin-block: 0 14px; }
+  .hero__tag { grid-area: tag; font-size: clamp(1rem, 4.5vw, 1.4rem); max-width: 24ch; }
+  /* Emblema 3D com a faixa zebrada passando atrás, como no desktop */
+  .hero__stage {
+    grid-area: stage;
+    display: block;
+    align-self: stretch;
+    width: 100%;
+    height: auto;
+    min-height: 210px;
+    margin-top: 8px;
+  }
+  /* Faixa zebrada de ponta a ponta, passando atrás do emblema */
+  .hero__hazard {
+    grid-area: stage;
+    display: block;
+    align-self: center;
+    width: auto; height: 38px;
+    margin: 0 calc(var(--gutter) * -1);
+  }
+  .hero__floor { bottom: 0; }
+  .hero__ctas { grid-area: cta; margin-top: 8px; }
+  .hero__ctas .btn { --h: 56px; }
 }
 
 /* Movimento reduzido ----------------------------------------------------- */
